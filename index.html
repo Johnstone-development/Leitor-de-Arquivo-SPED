@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor de Arquivo SPED</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin: 20px auto;
+            padding: 10px;
+            border: 2px dashed #007bff;
+            border-radius: 5px;
+            background-color: #e9f5ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="file"]:hover {
+            background-color: #d0ebff;
+        }
+
+
+    </style>
+</head>
+<body>
+    <h1>Leitor de Arquivo SPED (.EFD)</h1>
+    <input type="file" id="fileInput">
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("fileInput").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const format = file.name.split('.');
+
+            if(format[ format.length  - 1  ] != 'efd') { 
+                alert('Só é aceito arquivos no formato efd');
+                document.getElementById("fileInput").value = '';
+                return;
+            };
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split("\n");
+                const parsedData = lines.map(line => line.split("|"));
+                
+                // console.log(parsedData); // Exibe os dados no console
+                displayData(parsedData);
+            };
+            reader.readAsText(file);
+        });
+        
+        function displayData(data) {
+            const table = document.createElement("table");
+            const tbody = document.createElement("tbody");
+            
+            data.forEach((row, index) => {
+                const tr = document.createElement("tr");
+                row.forEach(cell => {
+                    if (cell.trim() !== "") { // Ignora células vazias
+                        const td = document.createElement(index === 0 ? "th" : "td");
+                        td.textContent = cell;
+                        tr.appendChild(td);
+                    }
+                });
+                tbody.appendChild(tr);
+            });
+            
+            table.appendChild(tbody);
+            const output = document.getElementById("output");
+            output.innerHTML = ""; // Limpa o conteúdo anterior
+            output.appendChild(table);
+        }
+    </script>
+</body>
+</html>
